@@ -30,41 +30,61 @@ export default function useLLMStream({
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
 
   // -----------------------------------------
-  // SSE 相關的 Ref
+  // SSE buffer
   // -----------------------------------------
-  const chunksRef = useRef<string[]>([]);
   const llmBufferRef = useRef<string>("");
 
-  // -----------------------------------------
-  // 假流式動畫
-  // -----------------------------------------
-  function startStreamingDisplay(fullText: string, onFinish?: () => void) {
-    let i = 0;
-    const delay = 30; // 可調整
+  const appendToAssistantMessage = (delta: string) => {
+    if (!delta) return;
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const updated = [...prev];
+      const lastIndex = updated.length - 1;
+      const lastMessage = updated[lastIndex];
+      if (!lastMessage || lastMessage.role !== "assistant") return prev;
 
-    // 插入一條空的 assistant 訊息
-    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      updated[lastIndex] = {
+        ...lastMessage,
+        content: lastMessage.content + delta,
+      };
+      return updated;
+    });
+  };
 
-    const interval = setInterval(() => {
-      i++;
-      const partial = fullText.slice(0, i);
-
-      setMessages((prev) => {
-        const updated = [...prev];
-        const lastIndex = updated.length - 1;
-        updated[lastIndex] = {
-          ...updated[lastIndex],
-          content: partial,
-        };
-        return updated;
+  const requestFollowUps = async (answer: string) => {
+    try {
+      const res = await fetch("http://localhost:8000/v2/react/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: "你是一個助手。只允許輸出 JSON 陣列，不要其他文字。",
+            },
+            {
+              role: "user",
+              content:
+                '請根據以下回答生成三個延伸追問問題，輸出格式必須是 JSON 陣列。例如:["問題1","問題2","問題3"]。\n\n回答內容: ' +
+                answer,
+            },
+          ],
+          llm_config: {
+            model: currentModel,
+            temperature,
+            max_tokens: 128,
+          },
+          thread_id: "thread-suggestions",
+        }),
       });
 
-      if (i >= fullText.length) {
-        clearInterval(interval);
-        if (onFinish) onFinish();
-      }
-    }, delay);
-  }
+      const json = await res.json();
+      const text = json?.messages?.[0]?.content ?? "";
+      setFollowUpQuestions(parseSuggestions(text));
+    } catch (err) {
+      console.error("延伸問題錯誤：", err);
+    }
+  };
 
   // -----------------------------------------
   // 解析延伸問題
@@ -114,6 +134,8 @@ export default function useLLMStream({
     ];
 
     try {
+      llmBufferRef.current = "";
+
       // 開 SSE 請求
       const response = await fetch("http://localhost:8000/v2/react/stream", {
         method: "POST",
@@ -182,60 +204,44 @@ export default function useLLMStream({
               break;
 
             case "llm_start":
-              chunksRef.current = [];
-              if (data.message_chunk)
-                chunksRef.current.push(data.message_chunk);
+              {
+                const chunk =
+                  typeof data.message_chunk === "string"
+                    ? data.message_chunk
+                    : "";
+                llmBufferRef.current = chunk;
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: chunk },
+                ]);
+              }
               break;
 
             case "llm_delta":
-              if (data.message_chunk)
-                chunksRef.current.push(data.message_chunk);
+              {
+                const chunk =
+                  typeof data.message_chunk === "string"
+                    ? data.message_chunk
+                    : "";
+                llmBufferRef.current += chunk;
+                appendToAssistantMessage(chunk);
+              }
               break;
 
             case "llm_end":
-              llmBufferRef.current = chunksRef.current.join("");
-
-              startStreamingDisplay(llmBufferRef.current, async () => {
-                // 要求延伸問題
-                try {
-                  const res = await fetch(
-                    "http://localhost:8000/v2/react/run",
-                    {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        messages: [
-                          {
-                            role: "system",
-                            content:
-                              "你是一個助手。只允許輸出 JSON 陣列，不要其他文字。",
-                          },
-                          {
-                            role: "user",
-                            content:
-                              '請根據以下回答生成三個延伸追問問題，輸出格式必須是 JSON 陣列。例如:["問題1","問題2","問題3"]。\n\n回答內容: ' +
-                              llmBufferRef.current,
-                          },
-                        ],
-                        llm_config: {
-                          model: currentModel,
-                          temperature,
-                          max_tokens: 128,
-                        },
-                        thread_id: "thread-suggestions",
-                      }),
-                    }
-                  );
-
-                  const json = await res.json();
-                  const text = json?.messages?.[0]?.content ?? "";
-                  setFollowUpQuestions(parseSuggestions(text));
-                } catch (err) {
-                  console.error("延伸問題錯誤：", err);
+              {
+                const chunk =
+                  typeof data.message_chunk === "string"
+                    ? data.message_chunk
+                    : "";
+                if (chunk) {
+                  llmBufferRef.current += chunk;
+                  appendToAssistantMessage(chunk);
                 }
-              });
 
-              setLoading(false);
+                requestFollowUps(llmBufferRef.current);
+                setLoading(false);
+              }
               break;
 
             default:
