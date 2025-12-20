@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-size-base: 16px;
+}
+
 /* 自訂動畫 */
 @keyframes float {
   0% {
@@ -28,6 +32,10 @@
 
 /* === 全站基底（黑色主題）=== */
 @layer base {
+  html {
+    font-size: var(--font-size-base);
+  }
+
   /* body：整站底色、字色、抗鋸齒 */
   body {
     @apply bg-neutral-950 text-neutral-200 antialiased;

@@ -1,5 +1,5 @@
 // src/components/Live2DArea.tsx
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Live2DPanel from "./Live2DPanel";
 
 type Live2DInfo = {
@@ -23,6 +23,10 @@ export default function Live2DArea({
   const [_models, _setModels] = useState<Live2DInfo[]>([]);
   const [resizeKey, setResizeKey] = useState(0);
 
+  const rebuildPanel = useCallback(() => {
+    setResizeKey((k) => k + 1);
+  }, []);
+
   useEffect(() => {
     let timer: any = null;
 
@@ -32,13 +36,20 @@ export default function Live2DArea({
       // 等使用者停止 resize 200ms 再重建 Live2DPanel
       timer = setTimeout(() => {
         // console.log("🔄 [resize] rebuilding Live2DPanel");
-        setResizeKey((k) => k + 1);
+        rebuildPanel();
       }, 200);
     };
 
     window.addEventListener("resize", handle);
     return () => window.removeEventListener("resize", handle);
-  }, []);
+  }, [rebuildPanel]);
+
+  useEffect(() => {
+    const handleFontSizeChange = () => rebuildPanel();
+    window.addEventListener("font-size-change", handleFontSizeChange);
+    return () =>
+      window.removeEventListener("font-size-change", handleFontSizeChange);
+  }, [rebuildPanel]);
 
   // 讀取模型清單
   useEffect(() => {
