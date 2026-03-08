@@ -1,4 +1,3 @@
-// src/data/mcpTools.ts
 export type ToolArg = {
   arg: string;
   type: string;
@@ -12,6 +11,7 @@ export type Tool = {
   args_schema?: ToolArg[];
 };
 
+// 工具清單（資料陣列）
 export const mcpTools: Tool[] = [
   {
     name: "日期 date_time",
@@ -56,6 +56,7 @@ export const mcpTools: Tool[] = [
   },
 ];
 
+// 中文描述對照（顯示用）
 // 中文描述對照（顯示用）
 export const toolZhDesc: Record<string, string> = {
   date_time: "顯示地區的日期與時間。",

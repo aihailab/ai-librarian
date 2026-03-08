@@ -1,10 +1,10 @@
-// src/hooks/useLive2D.ts
 import 'pixi-live2d-display/cubism4'
 import { useEffect } from 'react'
 import { Application, Graphics } from 'pixi.js'
 import { Live2DModel } from 'pixi-live2d-display/cubism4'
 
 export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
+
   useEffect(() => {
     if (!container || !modelUrl) return
     let destroyed = false
@@ -13,6 +13,7 @@ export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
     let removeResize: any = null
     let tickFn: ((dt: number) => void) | null = null
 
+    // async IIFE：載入模型與初始化 Pixi
     ;(async () => {
       try {
         const abs = new URL(modelUrl, window.location.origin).pathname
@@ -21,6 +22,7 @@ export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
         if (!res.ok) throw new Error(`Model not found: ${abs} (${res.status})`)
         const ct = (res.headers.get('content-type') || '').toLowerCase()
         if (!ct.includes('json')) {
+
           const txt = (await res.text()).slice(0, 120)
           throw new Error(`Expected JSON but got "${ct}". Path: ${abs}. Snippet: ${txt}`)
         }
@@ -28,6 +30,7 @@ export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
         // Pixi v7
         const maybeApp: any = new (Application as any)()
         if (typeof maybeApp.init === 'function') {
+
           await maybeApp.init({ backgroundAlpha: 0, resizeTo: container })
           container.appendChild(maybeApp.canvas)
           app = maybeApp
@@ -43,6 +46,7 @@ export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
 
         console.log('[Live2D] loading', abs)
         // ✅ 關掉 autoUpdate，改用手動 ticker
+
         model = await Live2DModel.from(abs, { autoUpdate: false })
         if (destroyed) return
         console.log('[Live2D] loaded:', model)
@@ -67,12 +71,14 @@ export function useLive2D(container: HTMLDivElement | null, modelUrl: string) {
           model.position.set(w / 2, h * 0.98)
         }
         fit()
+
         const onResize = () => requestAnimationFrame(fit)
         window.addEventListener('resize', onResize)
         removeResize = () => window.removeEventListener('resize', onResize)
         setTimeout(fit, 0)
 
         // ✅ 用 Pixi 的 ticker 手動驅動 Live2D
+
         tickFn = (dt: number) => {
           // dt 以 60FPS 為基準（~1.0）
           model.update?.(dt)

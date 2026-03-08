@@ -12,7 +12,9 @@ export default function Popover({
   return (
     <div
       className="relative inline-block"
+
       onMouseEnter={() => setOpen(true)}
+
       onMouseLeave={() => setOpen(false)}
     >
       {children}

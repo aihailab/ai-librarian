@@ -1,0 +1,15 @@
+{
+    "Type": "Live2D Expression",
+    "Parameters": [
+        {
+            "Id": "mitsuami",
+            "Value": 0.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "dango",
+            "Value": 1.0,
+            "Blend": "Add"
+        }
+    ]
+}

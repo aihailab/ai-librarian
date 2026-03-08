@@ -1,11 +1,6 @@
-// ============================================================
-//  📄 Librarian.tsx — AI 館員主畫面
-// ============================================================
-
 import type { ElementType } from "react";
 import { useState, useEffect } from "react";
 
-// === 工具資料與子元件 ===
 import { mcpTools, type Tool } from "../data/mcpTools";
 import {
   Clock,
@@ -29,10 +24,6 @@ import Popover from "../components/Popover";
 // LLM streaming hook（負責聊天／工具呼叫／情緒回傳）
 import useLLMStream from "../hooks/useLLMStream";
 
-// ============================================================
-//  🧩 工具名稱 → ICON 對照表
-// ============================================================
-
 const toolIconMap: Record<string, ElementType> = {
   date_time: Clock,
   arxiv: FlaskConical,
@@ -44,10 +35,6 @@ const toolIconMap: Record<string, ElementType> = {
   google_books: Bookmark,
   open_weather_map: CloudSun,
 };
-
-// ============================================================
-//  🧩 可選擇的模型列表
-// ============================================================
 
 const availableModels = [
   "openai:gpt-4o-mini",
@@ -62,34 +49,18 @@ const availableModels = [
 
 const defaultModel = "openai:gpt-4o-mini";
 
-// ============================================================
-//  🏛️ 主元件：Librarian
-// ============================================================
-
 export default function Librarian() {
-  // ============================================================
-  //  1️⃣ Live2D 模型狀態（角色 URL / 情緒）
-  // ============================================================
   const [modelUrl, setModelUrl] = useState<string>("");
   const [emotionToken, setEmotionToken] = useState<string | null>(null);
 
-  // ============================================================
-  //  2️⃣ MCP 工具 UI 狀態（哪個工具被選中）
-  // ============================================================
   const [selected, setSelected] = useState<Tool | null>(null);
 
-  // ============================================================
-  //  3️⃣ 模型相關設定（system prompt / 溫度等）
-  // ============================================================
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(1024);
   const [currentModel, setCurrentModel] = useState(defaultModel);
 
-  // ============================================================
-  //  4️⃣ 儲存設定到 localStorage
-  // ============================================================
   const applySettings = () => {
     const t = Math.min(1, Math.max(0, Number(temperature) || 0));
     const m = Math.max(1, Math.floor(Number(maxTokens) || 1));
@@ -110,9 +81,6 @@ export default function Librarian() {
     alert("設定已保存並套用");
   };
 
-  // ============================================================
-  //  5️⃣ 初始化：讀取 localStorage 內的設定
-  // ============================================================
   useEffect(() => {
     try {
       const raw = localStorage.getItem("aiConfig");
@@ -130,21 +98,16 @@ export default function Librarian() {
     }
   }, []);
 
-  // ============================================================
-  //  6️⃣ 使用自製 LLM streaming Hook
-  // ============================================================
   const { messages, followUpQuestions, input, setInput, loading, handleSend } =
     useLLMStream({
       systemPrompt,
       temperature,
       maxTokens,
       currentModel,
+
       onEmotion: (emo) => setEmotionToken(emo), // Model 回傳角色情緒
     });
 
-  // ============================================================
-  //  7️⃣ 初次無訊息顯示建議問題
-  // ============================================================
   const suggestedQuestions = [
     "要怎麼控制血糖比較好？有推薦的飲食書嗎？",
     "請幫我找一些關於預防失智或養腦運動的資料",
@@ -152,21 +115,15 @@ export default function Librarian() {
     "我今天心情不好可以給我幾首舒壓音樂嗎？",
   ];
 
-  // ============================================================
-  //  🖥️ 畫面渲染區
-  // ============================================================
   return (
     <div className="w-full max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 min-h-screen overflow-hidden">
-      {/* 左側：Live2D 角色區 */}
       <Live2DArea
         modelUrl={modelUrl}
         setModelUrl={setModelUrl}
         emotionToken={emotionToken}
       />
 
-      {/* 右側：聊天主視窗 */}
       <section className="card p-6 md:col-span-2 h-[80vh] flex flex-col">
-        {/* 標題列 + 設定按鈕 */}
         <header className="mb-4 flex justify-between items-center">
           <div>
             <h2 className="text-neutral-100 font-bold text-lg">對話區</h2>
@@ -193,7 +150,6 @@ export default function Librarian() {
           </Popover>
         </header>
 
-        {/* 設定 Modal */}
         {isConfigOpen && (
           <ConfigModal
             systemPrompt={systemPrompt}
@@ -205,7 +161,9 @@ export default function Librarian() {
             currentModel={currentModel}
             setCurrentModel={setCurrentModel}
             availableModels={availableModels}
+
             onClose={() => setIsConfigOpen(false)}
+
             onApply={() => {
               applySettings();
               setIsConfigOpen(false);
@@ -213,12 +171,12 @@ export default function Librarian() {
           />
         )}
 
-        {/* 初次建議按鈕 */}
         {messages.length === 0 && (
           <div className="mb-4 flex flex-wrap gap-2">
             {suggestedQuestions.map((q, i) => (
               <button
                 key={i}
+
                 onClick={() => handleSend(q)}
                 className="px-3 py-1 rounded-lg border border-sky-700/40 bg-sky-500/10 text-sky-300 hover:bg-sky-600/20 text-sm"
               >
@@ -228,17 +186,17 @@ export default function Librarian() {
           </div>
         )}
 
-        {/* 訊息列表 */}
         <MessageList
           messages={messages}
           followUpQuestions={followUpQuestions}
+
           onFollowUpClick={(q) => handleSend(q)}
         />
 
-        {/* 輸入欄位 */}
         <ChatInput
           input={input}
           setInput={setInput}
+
           onSend={(msg) => handleSend(msg)}
           loading={loading}
         />

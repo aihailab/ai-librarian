@@ -23,11 +23,25 @@ type Live2DModelExtended = Live2DModel & {
  * 3. try-catch 有完整 fallback
  * 4. 強制還原 scale 與 position，避免被表情/參數推到畫面外或放大縮小異常
  */
-export async function applyExpression(model: Live2DModelExtended, emotionToken?: string) {
+type ApplyExpressionOptions = {
+  basePath?: string;
+  expressionMap?: Record<string, string>;
+  motionGroupMap?: Record<string, string>;
+  scale?: [number, number];
+  position?: [number, number];
+  useFallback?: boolean;
+  useExpressionManager?: boolean;
+};
+
+export async function applyExpression(
+  model: Live2DModelExtended,
+  emotionToken?: string,
+  options?: ApplyExpressionOptions
+) {
   if (!model || !emotionToken) return
 
   // 表情 - 檔名對應表
-  const expressionMap: Record<string, string> = {
+  const expressionMap: Record<string, string> = options?.expressionMap ?? {
     neutral: "F04.exp3.json",
     happy: "F01.exp3.json",
     angry: "F03.exp3.json",
@@ -38,7 +52,7 @@ export async function applyExpression(model: Live2DModelExtended, emotionToken?:
   }
 
   // 動作 - 動作組對應表
-  const motionGroupMap: Record<string, string> = {
+  const motionGroupMap: Record<string, string> = options?.motionGroupMap ?? {
     neutral: "Idle",
     happy: "TapBody",
     angry: "TapBody",
@@ -50,17 +64,25 @@ export async function applyExpression(model: Live2DModelExtended, emotionToken?:
 
   const expFile = expressionMap[emotionToken]
   const motionGroup = motionGroupMap[emotionToken]
-  const expPath = `${window.location.origin}/Haru/expressions/${expFile}`
+  if (!expFile) return
+  const basePath = options?.basePath ?? "/Haru/expressions"
+  const expPath = `${window.location.origin}${basePath}/${expFile}`
 
   try {
     const core = model.internalModel?.coreModel
-    if (core) resetFace(core)
+    if (core && !options?.useExpressionManager) resetFace(core)
 
     const response = await fetch(expPath)
     if (!response.ok) throw new Error(`❌ 表情檔不存在: ${expPath}`)
     const expData = await response.json()
 
+    if (options?.useExpressionManager && model.expressionManager?.setExpression) {
+      model.expressionManager.setExpression(expData)
+      return
+    }
+
     if (core && expData.Parameters) {
+
       expData.Parameters.forEach((p: any) => {
         try {
           core.setParameterValueById(p.Id, p.Value)
@@ -72,19 +94,27 @@ export async function applyExpression(model: Live2DModelExtended, emotionToken?:
       console.log("🎨 成功套用表情（強制重設）", expFile)
     }
 
-    // 強制還原 scale 與 position
-    if (model && typeof model.scale?.set === 'function' && typeof model.position?.set === 'function') {
-      model.scale.set(0.32, 0.32)
-      model.position.set(153, 595)
+    if (
+      options?.scale &&
+      options?.position &&
+      model &&
+      typeof model.scale?.set === 'function' &&
+      typeof model.position?.set === 'function'
+    ) {
+      model.scale.set(options.scale[0], options.scale[1])
+      model.position.set(options.position[0], options.position[1])
     }
 
   } catch (err) {
-    console.warn("⚠️ exp3.json 套用失敗，改用 fallback：", err)
-    applyForcedExpression(model, emotionToken)
+    console.warn("⚠️ exp3.json 套用失敗", err)
+    if (options?.useFallback !== false) {
+      applyForcedExpression(model, emotionToken)
+    }
   }
 
   try {
     if (motionGroup) {
+
       await new Promise(resolve => setTimeout(resolve, 300))
       await model.motionManager?.startRandomMotion?.(motionGroup, 1)
     }
@@ -97,6 +127,7 @@ function applyForcedExpression(model: Live2DModelExtended, emotionToken: string)
   const core = model.internalModel?.coreModel
   if (!core) return
   resetFace(core)
+
   const safeSet = (id: string, value: number, min = 0, max = 1) =>
     core.setParameterValueById(id, Math.max(min, Math.min(max, value)))
   
@@ -147,6 +178,7 @@ function resetFace(core: { setParameterValueById: (id: string, value: number) =>
     "ParamEyeLOpen", "ParamEyeROpen", "ParamMouthOpenY", "ParamMouthForm",
     "ParamBrowLY", "ParamBrowRY", "ParamAngleZ"
   ]
+
   params.forEach((p) => {
     try { core.setParameterValueById(p, 0) } catch {}
   })

@@ -1,5 +1,3 @@
-// src/components/ToolsSection.tsx
-
 import type { ElementType } from "react";
 import { Search } from "lucide-react";
 
@@ -27,6 +25,7 @@ export default function ToolsSection({
   setSelected,
   toolIconMap,
 }: Props) {
+
   const IconByName = ({ name }: { name: string }) => {
     const Icon = toolIconMap[name] ?? Search;
     return <Icon className="w-4 h-4 text-sky-300" />;
@@ -34,7 +33,6 @@ export default function ToolsSection({
 
   return (
     <section className="card p-6 md:col-span-3 h-[46vh] flex flex-col overflow-hidden">
-      {/* 標題 */}
       <header className="mb-4">
         <h2 className="text-neutral-100 font-bold text-lg">
           AI Librarian 目前有使用的檢索工具（{mcpTools.length}）
@@ -42,7 +40,6 @@ export default function ToolsSection({
         <p className="text-neutral-400 text-sm">點擊工具可查看說明</p>
       </header>
 
-      {/* 工具按鈕清單 */}
       <div className="mb-4 flex flex-wrap gap-2">
         {mcpTools.map((t) => {
           const Icon = toolIconMap[t.name] ?? Search;
@@ -51,6 +48,7 @@ export default function ToolsSection({
           return (
             <button
               key={t.name}
+
               onClick={() => setSelected(t)}
               className={`chip transition ${
                 active
@@ -66,7 +64,6 @@ export default function ToolsSection({
         })}
       </div>
 
-      {/* 工具詳細資訊 */}
       <div className="flex-1 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 overflow-y-auto">
         {!selected ? (
           <p className="text-neutral-400">
@@ -74,7 +71,6 @@ export default function ToolsSection({
           </p>
         ) : (
           <div className="space-y-4">
-            {/* 標題 */}
             <div className="flex items-center gap-2">
               <IconByName name={selected.name} />
               <h3 className="text-lg font-bold text-neutral-100">

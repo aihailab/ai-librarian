@@ -26,13 +26,12 @@ export default function Home() {
 
       {/* 🔹 中央區塊 */}
       <div className="relative z-10 text-center">
-        {/* Slogan */}
         <h1 className="text-4xl md:text-6xl font-bold text-sky-400/70 mb-6 drop-shadow-lg">
           Unlock knowledge, powered by AI.
         </h1>
 
-        {/* Start 按鈕 */}
         <button
+
           onClick={() => navigate("/librarian")}
           className="px-10 py-4 text-lg font-semibold rounded-full 
                      bg-sky-600 text-white shadow-lg hover:bg-sky-500 
