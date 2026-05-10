@@ -4,7 +4,50 @@
 @tailwind utilities;
 
 :root {
-  --font-size-base: 16px;
+  --font-size-base: 20px;
+  --cursor-x: 50vw;
+  --cursor-y: 50vh;
+  --color-bg-page: #f7f4ee;
+  --color-bg-page-rgb: 247, 244, 238;
+  --color-bg-card: #ffffff;
+  --color-bg-panel: #fcfaf7;
+  --color-bg-input: #ffffff;
+  --color-border: #d6d3d1;
+  --color-border-strong: #cbd5e1;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-accent-strong: #2563eb;
+  --color-accent-soft: #dbeafe;
+  --color-accent-border: #93c5fd;
+  --color-accent-text: #1d4ed8;
+  --color-shadow: 15 23 42;
+  --color-overlay: rgba(15, 23, 42, 0.28);
+  --color-motion-orb-a: rgba(147, 197, 253, 0.22);
+  --color-motion-orb-b: rgba(255, 255, 255, 0.48);
+  --color-motion-cursor: rgba(96, 165, 250, 0.18);
+}
+
+:root[data-theme="dark"] {
+  --color-bg-page: #000000;
+  --color-bg-page-rgb: 0, 0, 0;
+  --color-bg-card: rgba(23, 23, 23, 0.6);
+  --color-bg-panel: rgba(23, 23, 23, 0.4);
+  --color-bg-input: #171717;
+  --color-border: #262626;
+  --color-border-strong: #404040;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-accent-strong: #38bdf8;
+  --color-accent-soft: rgba(14, 165, 233, 0.12);
+  --color-accent-border: rgba(14, 165, 233, 0.35);
+  --color-accent-text: #7dd3fc;
+  --color-shadow: 0 0 0;
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-motion-orb-a: rgba(14, 165, 233, 0.12);
+  --color-motion-orb-b: rgba(56, 189, 248, 0.08);
+  --color-motion-cursor: rgba(56, 189, 248, 0.12);
 }
 
 /* 自訂動畫 */
@@ -23,6 +66,30 @@
   }
 }
 
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -2%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes driftReverse {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-4%, 3%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 .animate-float {
   animation-name: float;
   animation-timing-function: ease-in-out;
@@ -38,7 +105,14 @@
 
   /* body：整站底色、字色、抗鋸齒 */
   body {
-    @apply bg-neutral-950 text-neutral-200 antialiased;
+    background:
+      radial-gradient(circle at top, rgba(var(--color-bg-page-rgb), 0.96), var(--color-bg-page) 65%);
+    color: var(--color-text-primary);
+    transition:
+      background-color 320ms ease,
+      color 320ms ease,
+      border-color 320ms ease;
+    @apply antialiased;
   }
 
   /* 文字選取時的藍色光暈 */
@@ -51,23 +125,323 @@
 @layer components {
   /* 霧面玻璃卡片：黑底、細邊、圓角、柔陰影 */
   .card {
-    @apply bg-neutral-900/60 border border-neutral-800 rounded-2xl shadow-xl shadow-black/40;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 20px 45px rgba(var(--color-shadow), 0.12);
+    transition:
+      transform 240ms ease,
+      box-shadow 240ms ease,
+      background-color 320ms ease,
+      border-color 320ms ease;
+    @apply rounded-2xl;
   }
 
-  /* 小膠囊標籤（chip） */
   .chip {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/60;
+    background-color: var(--color-bg-panel);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1.5;
   }
 
-  /* 主要按鈕（藍色霓虹感） */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-sky-600/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300;
+    @apply inline-flex items-center gap-2 rounded-xl px-4 py-2;
   }
 
-  /* 次要幽靈按鈕（深色 hover） */
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-neutral-800/60;
+    @apply inline-flex items-center gap-2 rounded-xl px-3 py-2;
   }
+}
+
+.theme-nav {
+  background-color: rgba(var(--color-bg-page-rgb), 0.86);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  backdrop-filter: blur(18px);
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    color 320ms ease;
+}
+
+.theme-footer {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.theme-panel {
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+}
+
+.theme-control-shell {
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+}
+
+.theme-control-button {
+  background-color: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.theme-control-button:hover {
+  background-color: var(--color-accent-soft);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  box-shadow: 0 12px 28px rgba(var(--color-shadow), 0.12);
+  transition:
+    transform 180ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-bg-panel);
+}
+
+.theme-input {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.theme-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--color-accent-strong) 45%, transparent);
+  outline-offset: 1px;
+}
+
+.theme-button-primary {
+  background-color: var(--color-accent-strong);
+  color: white;
+  box-shadow: 0 14px 32px rgba(var(--color-shadow), 0.14);
+  transition:
+    transform 180ms ease,
+    filter 180ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.theme-button-primary:hover {
+  filter: brightness(1.04);
+}
+
+.theme-button-secondary {
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition:
+    transform 180ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+.theme-button-secondary:hover {
+  background-color: var(--color-accent-soft);
+}
+
+.theme-button-accent {
+  background-color: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border);
+  color: var(--color-accent-text);
+  transition:
+    transform 180ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    filter 180ms ease;
+}
+
+.theme-button-accent:hover,
+.theme-button-accent-active {
+  filter: brightness(0.98);
+}
+
+.theme-icon-button {
+  color: var(--color-text-secondary);
+  transition:
+    transform 180ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.theme-icon-button:hover {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.theme-overlay {
+  background-color: var(--color-overlay);
+}
+
+.theme-modal,
+.theme-popover {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  box-shadow: 0 24px 50px rgba(var(--color-shadow), 0.16);
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    color 320ms ease;
+}
+
+.chip-active {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent-border);
+  color: var(--color-accent-text);
+}
+
+.chip-idle:hover {
+  background-color: var(--color-accent-soft);
+}
+
+.message-bubble-user {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  border: 1px solid var(--color-accent-border);
+}
+
+.message-bubble-assistant {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.message-markdown {
+  color: inherit;
+}
+
+.message-markdown p,
+.message-markdown ul,
+.message-markdown ol {
+  margin: 0;
+}
+
+.message-list li + li {
+  margin-top: 0.2rem;
+}
+
+.message-link {
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  word-break: break-all;
+}
+
+.message-link:hover {
+  color: var(--color-accent-strong);
+}
+
+.message-inline-code {
+  border: 1px solid var(--color-border);
+  background-color: color-mix(in srgb, var(--color-bg-panel) 82%, transparent);
+  border-radius: 0.35rem;
+  padding: 0.08rem 0.32rem;
+  font-size: 0.95em;
+}
+
+.theme-live2d-stage {
+  background-color: var(--color-bg-panel);
+  border-color: var(--color-accent-border);
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease;
+}
+
+.theme-emotion-pill {
+  background-color: rgba(var(--color-bg-page-rgb), 0.84);
+  border: 1px solid var(--color-accent-border);
+  color: var(--color-text-primary);
+}
+
+.home-shell {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--color-accent-soft) 50%, transparent), transparent 42%),
+    linear-gradient(180deg, rgba(var(--color-bg-page-rgb), 0.98), var(--color-bg-page));
+}
+
+.home-title {
+  color: color-mix(in srgb, var(--color-accent-strong) 68%, var(--color-text-primary));
+  text-shadow: 0 6px 20px rgba(var(--color-shadow), 0.1);
+}
+
+.ambient-motion-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.9;
+  will-change: transform;
+}
+
+.ambient-orb-primary {
+  top: -12%;
+  left: -8%;
+  width: 36rem;
+  height: 36rem;
+  background: radial-gradient(circle, var(--color-motion-orb-a) 0%, transparent 72%);
+  animation: drift 15s ease-in-out infinite;
+}
+
+.ambient-orb-secondary {
+  right: -10%;
+  bottom: -18%;
+  width: 32rem;
+  height: 32rem;
+  background: radial-gradient(circle, var(--color-motion-orb-b) 0%, transparent 70%);
+  animation: driftReverse 18s ease-in-out infinite;
+}
+
+.ambient-cursor-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      16rem circle at var(--cursor-x) var(--cursor-y),
+      var(--color-motion-cursor) 0%,
+      transparent 72%
+    );
+  transition: background 140ms ease-out;
+}
+
+.motion-surface:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 26px 54px rgba(var(--color-shadow), 0.14);
+}
+
+.motion-button:hover {
+  transform: translateY(-1px);
 }
 
 @keyframes fadeIn {

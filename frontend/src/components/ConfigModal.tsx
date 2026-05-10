@@ -29,16 +29,19 @@ export default function ConfigModal({
   onApply,
 }: ConfigModalProps) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-neutral-900 p-6 rounded-xl shadow-xl w-full max-w-md border border-neutral-700">
-        <h3 className="text-lg font-bold text-neutral-100 mb-4">模型設定</h3>
+    <div className="theme-overlay fixed inset-0 z-50 flex items-center justify-center">
+      <div className="theme-modal w-full max-w-md rounded-xl p-6 shadow-xl">
+        <h3 className="mb-4 text-lg font-bold text-[var(--color-text-primary)]">
+          模型設定
+        </h3>
 
-        <label className="block text-sm text-neutral-300 mb-1">選擇模型</label>
+        <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
+          選擇模型
+        </label>
         <select
           value={currentModel}
-
           onChange={(e) => setCurrentModel(e.target.value)}
-          className="w-full px-3 py-2 mb-4 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-100"
+          className="theme-input mb-4 w-full rounded-lg px-3 py-2"
         >
           {availableModels.map((m) => (
             <option key={m} value={m}>
@@ -47,20 +50,21 @@ export default function ConfigModal({
           ))}
         </select>
 
-        <label className="block text-sm text-neutral-300 mb-1">
+        <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
           System Prompt
         </label>
         <textarea
           value={systemPrompt}
-
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 mb-4 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-100 resize-none"
+          className="theme-input mb-4 w-full resize-none rounded-lg px-3 py-2"
         />
 
-        <label className="block text-sm text-neutral-300 mb-1">
+        <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
           Temperature{" "}
-          <span className="text-neutral-400">(數值越高，回答越有創意)</span>
+          <span className="text-[var(--color-text-muted)]">
+            (數值越高，回答越有創意)
+          </span>
         </label>
         <input
           type="number"
@@ -68,32 +72,33 @@ export default function ConfigModal({
           min="0"
           max="1"
           value={temperature}
-
           onChange={(e) => setTemperature(Number(e.target.value))}
-          className="w-full px-3 py-2 mb-4 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-100"
+          className="theme-input mb-4 w-full rounded-lg px-3 py-2"
         />
 
-        <label className="block text-sm text-neutral-300 mb-1">
-          Max Tokens <span className="text-neutral-400">(限制回答長度)</span>
+        <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
+          Max Tokens{" "}
+          <span className="text-[var(--color-text-muted)]">
+            (限制回答長度)
+          </span>
         </label>
         <input
           type="number"
           value={maxTokens}
-
           onChange={(e) => setMaxTokens(Number(e.target.value))}
-          className="w-full px-3 py-2 mb-6 rounded-lg bg-neutral-800 border border-neutral-700 text-neutral-100"
+          className="theme-input mb-6 w-full rounded-lg px-3 py-2"
         />
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-neutral-700 text-neutral-200 hover:bg-neutral-600"
+            className="theme-button-secondary rounded-lg px-4 py-2"
           >
             取消
           </button>
           <button
             onClick={onApply}
-            className="px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-500"
+            className="theme-button-primary rounded-lg px-4 py-2"
           >
             儲存並套用
           </button>

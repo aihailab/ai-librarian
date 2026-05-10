@@ -3,15 +3,17 @@ import { useState } from "react";
 export default function Popover({
   children,
   content,
+  className = "inline-block",
 }: {
   children: React.ReactNode;
   content: React.ReactNode;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <div
-      className="relative inline-block"
+      className={`relative ${className}`}
 
       onMouseEnter={() => setOpen(true)}
 
@@ -21,14 +23,7 @@ export default function Popover({
 
       {open && (
         <div
-          className="
-            absolute right-0 top-full mt-2 
-            w-56 p-3 rounded-lg 
-            bg-neutral-900 border border-neutral-700 shadow-xl
-            text-neutral-200 text-sm 
-            animate-fadeIn
-            z-50
-          "
+          className="theme-popover absolute right-0 top-full z-50 mt-2 w-56 rounded-lg p-3 text-sm animate-fadeIn"
         >
           {content}
         </div>

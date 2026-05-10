@@ -9,7 +9,7 @@ export default function FontSizeController({
   variant = "floating",
   className = "",
 }: Props) {
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(20);
 
   // 初始化讀取 localStorage
 
@@ -37,7 +37,7 @@ export default function FontSizeController({
 
   const isFloating = variant === "floating";
   const baseContainerClass = isFloating
-    ? "fixed bottom-6 left-6 z-[999] flex flex-col gap-2 bg-black/40 backdrop-blur-md p-3 rounded-lg shadow-lg"
+    ? "theme-control-shell fixed bottom-6 left-6 z-[999] flex flex-col gap-2 rounded-lg p-3 shadow-lg backdrop-blur-md"
     : "flex items-center gap-2 text-xs sm:text-sm";
 
   const containerClass = className
@@ -45,8 +45,8 @@ export default function FontSizeController({
     : baseContainerClass;
 
   const buttonClass = isFloating
-    ? "px-3 py-1 text-white rounded bg-blue-600 hover:bg-blue-500 font-semibold"
-    : "px-2 py-1 rounded border border-neutral-700 text-neutral-200 hover:bg-neutral-800 transition text-xs sm:text-sm";
+    ? "theme-button-primary rounded px-3 py-1 font-semibold"
+    : "theme-control-button px-2 py-1 text-xs transition sm:text-sm";
 
   return (
     <div className={containerClass}>

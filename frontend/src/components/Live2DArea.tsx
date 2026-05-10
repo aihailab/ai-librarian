@@ -79,7 +79,7 @@ export default function Live2DArea({
 
   return (
     <section className="card p-6 md:col-span-1 h-[80vh] relative">
-      <div className="absolute inset-0 rounded-xl border border-dashed border-sky-700/40 bg-neutral-900/40 z-0">
+      <div className="theme-live2d-stage absolute inset-0 z-0 rounded-xl border border-dashed">
         {modelUrl && (
           <Live2DPanel
             key={`${modelUrl}-${resizeKey}`}
@@ -94,10 +94,10 @@ export default function Live2DArea({
         <select
           value={modelUrl}
           onChange={(e) => setModelUrl(e.target.value)}
-          className="rounded-md border border-sky-700/40 bg-neutral-900/80 px-2 py-1 text-[11px] text-neutral-200"
+          className="theme-input rounded-md px-2 py-1 text-[11px]"
         >
           {_models.map((m) => (
-            <option key={m.url} value={m.url} className="bg-neutral-900">
+            <option key={m.url} value={m.url}>
               {m.name}
             </option>
           ))}
@@ -105,9 +105,9 @@ export default function Live2DArea({
       </div>
 
       <div className="absolute bottom-2 right-2 z-10">
-        <div className="flex items-center gap-2 rounded-md border border-sky-700/40 bg-neutral-900/70 px-2 py-1 text-[10px] text-neutral-200 backdrop-blur">
-          <span className="text-neutral-400">emotion</span>
-          <span className="font-mono text-sky-300">
+        <div className="theme-emotion-pill flex items-center gap-2 rounded-md px-2 py-1 text-[10px] backdrop-blur">
+          <span className="text-[var(--color-text-secondary)]">emotion</span>
+          <span className="font-mono text-[var(--color-accent-text)]">
             {emotionToken ? emotionToken : "-"}
           </span>
         </div>

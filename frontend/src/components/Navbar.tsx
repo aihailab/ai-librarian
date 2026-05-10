@@ -1,29 +1,89 @@
-import { Link } from "react-router-dom";
-import { BookOpen } from "lucide-react";
+import { Link, NavLink } from "react-router-dom";
+import { BookOpen, MessageCircleMore } from "lucide-react";
 import FontSizeController from "./FontSizeController";
+import ThemeToggle from "./ThemeToggle";
+
+const navItems = [
+  {
+    to: "/librarian",
+    label: "聊天問答",
+    icon: MessageCircleMore,
+  },
+  // 暫時隱藏熟齡繪本入口；路由與頁面保留，之後可再打開。
+  // {
+  //   to: "/picture-book",
+  //   label: "熟齡繪本",
+  //   icon: BookImage,
+  // },
+];
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 bg-neutral-950/70 backdrop-blur-lg border-b border-neutral-800">
-      <div className="max-w-7xl mx-auto px-5 h-20 flex items-center justify-between">
-        {/* 左 LOGO */}
-        <Link
-          to="/"
-          className="flex items-center gap-3 hover:opacity-80 transition"
-        >
-          <BookOpen className="w-7 h-7 text-sky-400" />
-          <div>
-            <div className="text-neutral-100 font-bold">AI Librarian</div>
-            <div className="text-xs text-neutral-400">智慧搜尋幫手</div>
-          </div>
-        </Link>
+    <nav className="theme-nav sticky top-0 z-50">
+      <div className="mx-auto flex min-h-20 max-w-7xl flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            to="/"
+            className="flex items-center gap-3 transition hover:opacity-80"
+          >
+            <BookOpen className="h-7 w-7 text-[var(--color-accent-strong)]" />
+            <div>
+              <div className="font-bold text-[var(--color-text-primary)]">
+                AI Librarian
+              </div>
+              <div className="text-xs text-[var(--color-text-secondary)]">
+                智慧搜尋幫手
+              </div>
+            </div>
+          </Link>
 
-        {/* 右側字體控制鈕 */}
-        <div className="flex items-center gap-3">
-          <span className="text-neutral-400 text-xs sm:text-sm">字體大小</span>
+          <div className="hidden flex-wrap gap-2 lg:flex">
+            {navItems.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+                    isActive
+                      ? "theme-button-accent theme-button-accent-active"
+                      : "theme-button-secondary"
+                  }`
+                }
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full flex-wrap gap-2 lg:hidden">
+            {navItems.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+                    isActive
+                      ? "theme-button-accent theme-button-accent-active"
+                      : "theme-button-secondary"
+                  }`
+                }
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </NavLink>
+            ))}
+          </div>
+
+          <ThemeToggle className="motion-button" />
+          <span className="text-xs text-[var(--color-text-secondary)] sm:text-sm">
+            字體大小
+          </span>
           <FontSizeController
             variant="inline"
-            className="bg-neutral-900/40 border border-neutral-800 rounded-full px-3 py-1"
+            className="theme-control-shell rounded-full px-3 py-1"
           />
         </div>
       </div>
