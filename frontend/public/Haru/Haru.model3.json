@@ -2,7 +2,10 @@
   "Version": 3,
   "FileReferences": {
     "Moc": "Haru.moc3",
-    "Textures": ["Haru.2048/texture_00.png", "Haru.2048/texture_01.png"],
+    "Textures": [
+      "Haru.2048/texture_00_use.png",
+      "Haru.2048/texture_01_use.png"
+    ],
     "Physics": "Haru.physics3.json",
     "Pose": "Haru.pose3.json",
     "DisplayInfo": "Haru.cdi3.json",

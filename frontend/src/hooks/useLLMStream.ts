@@ -1,5 +1,3 @@
-// hooks/useLLMStream.ts
-
 import { useState, useRef } from "react";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -21,23 +19,18 @@ export default function useLLMStream({
   currentModel,
   onEmotion,
 }: APIConfig) {
-  // -----------------------------------------
-  // 核心聊天狀態
-  // -----------------------------------------
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
 
-  // -----------------------------------------
-  // SSE buffer
-  // -----------------------------------------
   const llmBufferRef = useRef<string>("");
 
   const appendToAssistantMessage = (delta: string) => {
     if (!delta) return;
     setMessages((prev) => {
       if (prev.length === 0) return prev;
+
       const updated = [...prev];
       const lastIndex = updated.length - 1;
       const lastMessage = updated[lastIndex];
@@ -51,8 +44,10 @@ export default function useLLMStream({
     });
   };
 
+  // async/await + Promise：向後端請求延伸問題
   const requestFollowUps = async (answer: string) => {
     try {
+
       const res = await fetch("http://localhost:8000/v2/react/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,9 +81,7 @@ export default function useLLMStream({
     }
   };
 
-  // -----------------------------------------
-  // 解析延伸問題
-  // -----------------------------------------
+  // function 宣告：解析延伸問題
   function parseSuggestions(text: string): string[] {
     try {
       const arr = JSON.parse(text);
@@ -103,6 +96,7 @@ export default function useLLMStream({
       } catch (_) {}
     }
 
+    // split + map + filter：寬鬆解析（map/filter 語法）
     return text
       .split(/\n|,|。/g)
       .map((s) => s.trim())
@@ -110,15 +104,14 @@ export default function useLLMStream({
       .slice(0, 3);
   }
 
-  // -----------------------------------------
-  // 🔥 核心：handleSend（含 SSE）
-  // -----------------------------------------
+  // async/await：送出訊息並接收 SSE
   const handleSend = async (customInput?: string) => {
     const text = customInput ?? input;
     if (!text.trim()) return;
 
     // 先插入使用者訊息
     const userMsg: Message = { role: "user", content: text };
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
@@ -127,6 +120,7 @@ export default function useLLMStream({
     // 組 API messages
     const messagesForAPI: APIMessage[] = [
       { role: "system", content: systemPrompt },
+
       ...messages.map(
         (m) => ({ role: m.role, content: m.content } as APIMessage)
       ),
@@ -137,6 +131,7 @@ export default function useLLMStream({
       llmBufferRef.current = "";
 
       // 開 SSE 請求
+
       const response = await fetch("http://localhost:8000/v2/react/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,6 +153,7 @@ export default function useLLMStream({
       let buffer = "";
 
       while (true) {
+
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -165,10 +161,12 @@ export default function useLLMStream({
         const parts = buffer.split("\n\n");
         buffer = parts.pop() || "";
 
+        // for...of：逐段解析 SSE 區塊
         for (const part of parts) {
           if (!part.trim()) continue;
 
           const lines = part.split("\n");
+          // find（callback 為箭頭函式）
           const eventLine = lines.find((l) => l.startsWith("event:"));
           const dataLine = lines.find((l) => l.startsWith("data:"));
           if (!eventLine || !dataLine) continue;
@@ -179,9 +177,7 @@ export default function useLLMStream({
             .toLowerCase();
           const data = JSON.parse(dataLine.replace("data:", "").trim());
 
-          // ----------------------------------------------------
           // 處理不同事件
-          // ----------------------------------------------------
           switch (eventType) {
             case "tool_chosen":
               setMessages((prev) => [
@@ -198,6 +194,7 @@ export default function useLLMStream({
               break;
 
             case "emotion":
+
               if (onEmotion && data.emotion) {
                 onEmotion(data.emotion);
               }
@@ -205,11 +202,13 @@ export default function useLLMStream({
 
             case "llm_start":
               {
+
                 const chunk =
                   typeof data.message_chunk === "string"
                     ? data.message_chunk
                     : "";
                 llmBufferRef.current = chunk;
+
                 setMessages((prev) => [
                   ...prev,
                   { role: "assistant", content: chunk },
@@ -219,6 +218,7 @@ export default function useLLMStream({
 
             case "llm_delta":
               {
+
                 const chunk =
                   typeof data.message_chunk === "string"
                     ? data.message_chunk
@@ -230,6 +230,7 @@ export default function useLLMStream({
 
             case "llm_end":
               {
+
                 const chunk =
                   typeof data.message_chunk === "string"
                     ? data.message_chunk
@@ -261,9 +262,6 @@ export default function useLLMStream({
     }
   };
 
-  // -----------------------------------------
-  // Hook 對外提供的內容
-  // -----------------------------------------
   return {
     messages,
     followUpQuestions,

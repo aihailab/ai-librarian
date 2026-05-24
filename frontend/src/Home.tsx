@@ -1,19 +1,24 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import ThemeToggle from "./components/ThemeToggle";
+import { useTheme } from "./theme";
 
 export default function Home() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { theme } = useTheme();
+  const particleClass =
+    theme === "light" ? "bg-sky-300/60" : "bg-white/80";
 
   return (
-    <div className="relative h-screen w-full bg-black overflow-hidden flex items-center justify-center">
-      {/* 🔵 發光粒子背景 */}
-      
+    <div className="home-shell relative z-10">
+      <div className="absolute right-6 top-6 z-20">
+        <ThemeToggle />
+      </div>
+
       <div className="absolute inset-0">
-        
         {Array.from({ length: 40 }).map((_, i) => (
           <span
             key={i}
-            className="absolute w-1.5 h-1.5 rounded-full  bg-white/80 opacity-70 animate-float"
-            
+            className={`absolute h-1.5 w-1.5 rounded-full opacity-70 animate-float ${particleClass}`}
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
@@ -24,23 +29,18 @@ export default function Home() {
         ))}
       </div>
 
-      {/* 🔹 中央區塊 */}
-      <div className="relative z-10 text-center">
-        {/* Slogan */}
-        <h1 className="text-4xl md:text-6xl font-bold text-sky-400/70 mb-6 drop-shadow-lg">
+      <div className="relative z-10 text-center px-6">
+        <h1 className="home-title mb-6 text-4xl font-bold md:text-6xl">
           Unlock knowledge, powered by AI.
         </h1>
 
-        {/* Start 按鈕 */}
         <button
           onClick={() => navigate("/librarian")}
-          className="px-10 py-4 text-lg font-semibold rounded-full 
-                     bg-sky-600 text-white shadow-lg hover:bg-sky-500 
-                     transition-all duration-300 animate-pulse"
+          className="theme-button-primary motion-button rounded-full px-10 py-4 text-lg font-semibold"
         >
           Start
         </button>
       </div>
     </div>
-  )
+  );
 }

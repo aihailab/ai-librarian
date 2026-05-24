@@ -1,0 +1,83 @@
+{
+	"Version": 3,
+	"Meta": {
+		"Duration": 1.167,
+		"Fps": 30.0,
+		"Loop": true,
+		"AreBeziersRestricted": false,
+		"CurveCount": 3,
+		"TotalSegmentCount": 9,
+		"TotalPointCount": 20,
+		"UserDataCount": 0,
+		"TotalUserDataSize": 0
+	},
+	"Curves": [
+		{
+			"Target": "Parameter",
+			"Id": "guruguru2",
+			"Segments": [
+				0,
+				0,
+				0,
+				1.167,
+				1
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "namida2",
+			"Segments": [
+				0,
+				0,
+				0,
+				0.167,
+				0,
+				0,
+				0.8,
+				1,
+				0,
+				0.933,
+				1,
+				0,
+				1.167,
+				1
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "namida3",
+			"Segments": [
+				0,
+				0,
+				1,
+				0.067,
+				0,
+				0.133,
+				0,
+				0.2,
+				0,
+				1,
+				0.256,
+				0,
+				0.311,
+				0,
+				0.367,
+				0,
+				1,
+				0.6,
+				0,
+				0.833,
+				1,
+				1.067,
+				1,
+				1,
+				1.1,
+				1,
+				1.133,
+				1,
+				1.167,
+				1
+			]
+		}
+	]
+}

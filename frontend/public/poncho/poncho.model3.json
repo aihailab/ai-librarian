@@ -1,0 +1,98 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "poncho.moc3",
+    "Textures": ["poncho.2048/texture_00_use.png"],
+    "Physics": "poncho.physics3.json",
+    "Expressions": [
+      {
+        "Name": "aozame",
+        "File": "expressions/aozame.exp3.json"
+      },
+      {
+        "Name": "ase",
+        "File": "expressions/ase.exp3.json"
+      },
+      {
+        "Name": "awawa",
+        "File": "expressions/awawa.exp3.json"
+      },
+      {
+        "Name": "bousiONOFF",
+        "File": "expressions/bousiONOFF.exp3.json"
+      },
+      {
+        "Name": "cheek",
+        "File": "expressions/cheek.exp3.json"
+      },
+      {
+        "Name": "guruguru",
+        "File": "expressions/guruguru.exp3.json"
+      },
+      {
+        "Name": "heart",
+        "File": "expressions/heart.exp3.json"
+      },
+      {
+        "Name": "itome",
+        "File": "expressions/itome.exp3.json"
+      },
+      {
+        "Name": "kirari",
+        "File": "expressions/kirari.exp3.json"
+      },
+      {
+        "Name": "namida",
+        "File": "expressions/namida.exp3.json"
+      },
+      {
+        "Name": "nekokuti",
+        "File": "expressions/nekokuti.exp3.json"
+      },
+      {
+        "Name": "outerONOFF",
+        "File": "expressions/outerONOFF.exp3.json"
+      },
+      {
+        "Name": "pero",
+        "File": "expressions/pero.exp3.json"
+      },
+      {
+        "Name": "puku",
+        "File": "expressions/puku.exp3.json"
+      },
+      {
+        "Name": "お団子",
+        "File": "expressions/お団子.exp3.json"
+      },
+      {
+        "Name": "三つ編み",
+        "File": "expressions/三つ編み.exp3.json"
+      },
+      {
+        "Name": "悲しみ",
+        "File": "expressions/悲しみ.exp3.json"
+      }
+    ],
+    "Motions": {
+      "Idle": [
+        {
+          "File": "motions/涙ぐるぐるアニメ.motion3.json"
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": []
+    },
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": ["ParamEyeROpen", "ParamEyeLOpen"]
+    }
+  ],
+  "HitAreas": []
+}

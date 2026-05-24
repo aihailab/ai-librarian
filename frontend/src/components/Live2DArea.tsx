@@ -1,4 +1,3 @@
-// src/components/Live2DArea.tsx
 import { useCallback, useEffect, useState } from "react";
 import Live2DPanel from "./Live2DPanel";
 
@@ -11,8 +10,7 @@ type Live2DInfo = {
 type Props = {
   modelUrl: string;
   setModelUrl: (url: string) => void;
-  emotionToken: string | null; // ⚠ 改成 string | null 比較彈性
-  //setEmotionToken: (emo: string | null) => void;
+  emotionToken: string | null;
 };
 
 export default function Live2DArea({
@@ -33,9 +31,7 @@ export default function Live2DArea({
     const handle = () => {
       if (timer) clearTimeout(timer);
 
-      // 等使用者停止 resize 200ms 再重建 Live2DPanel
       timer = setTimeout(() => {
-        // console.log("🔄 [resize] rebuilding Live2DPanel");
         rebuildPanel();
       }, 200);
     };
@@ -51,7 +47,6 @@ export default function Live2DArea({
       window.removeEventListener("font-size-change", handleFontSizeChange);
   }, [rebuildPanel]);
 
-  // 讀取模型清單
   useEffect(() => {
     const manifestPath = "/index.json";
 
@@ -61,6 +56,7 @@ export default function Live2DArea({
         return res.json();
       })
       .then((list: Live2DInfo[]) => {
+
         const normalized = list.map((m) => {
           const name = m.name.trim();
           const good =
@@ -72,7 +68,6 @@ export default function Live2DArea({
 
         _setModels(normalized);
 
-        // 預設載入第一個角色
         const first = normalized.find((m) => m.url.endsWith(".model3.json"));
         setModelUrl(first?.url ?? normalized[0]?.url ?? "");
       })
@@ -84,19 +79,39 @@ export default function Live2DArea({
 
   return (
     <section className="card p-6 md:col-span-1 h-[80vh] relative">
-      {/* === Live2D 顯示區 === */}
-      <div className="absolute inset-0 rounded-xl border border-dashed border-sky-700/40 bg-neutral-900/40 z-0">
+      <div className="theme-live2d-stage absolute inset-0 z-0 rounded-xl border border-dashed">
         {modelUrl && (
           <Live2DPanel
             key={`${modelUrl}-${resizeKey}`}
             modelUrl={modelUrl}
             className="w-full h-full"
-            emotionToken={emotionToken ?? undefined} // SSE 會直接控制
+            emotionToken={emotionToken ?? undefined}
           />
         )}
       </div>
 
-      {/* ❌ Emotion 按鈕已移除 */}
+      <div className="absolute top-2 right-2 z-10">
+        <select
+          value={modelUrl}
+          onChange={(e) => setModelUrl(e.target.value)}
+          className="theme-input rounded-md px-2 py-1 text-[11px]"
+        >
+          {_models.map((m) => (
+            <option key={m.url} value={m.url}>
+              {m.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="absolute bottom-2 right-2 z-10">
+        <div className="theme-emotion-pill flex items-center gap-2 rounded-md px-2 py-1 text-[10px] backdrop-blur">
+          <span className="text-[var(--color-text-secondary)]">emotion</span>
+          <span className="font-mono text-[var(--color-accent-text)]">
+            {emotionToken ? emotionToken : "-"}
+          </span>
+        </div>
+      </div>
     </section>
   );
 }
